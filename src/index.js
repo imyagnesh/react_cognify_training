@@ -1,16 +1,15 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import App from "./App";
 
 // Rules
 // 1. Name should should start with capital letter
 // 2. return only single element
 // 3. use className instead of class
 
-const App = () => (
-  <>
-    <h1 className="header">Hello World</h1>
-    <h2>yagnesh</h2>
-  </>
-);
+// Props
+// 1. immutable value
 
-ReactDOM.render(<App />, document.getElementById("root"));
+// Function component
+
+ReactDOM.render(<App firstName="yagnesh" lastName="modh" />, document.getElementById("root"));

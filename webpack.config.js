@@ -1,5 +1,5 @@
 const path = require("path");
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
   mode: "development",
@@ -9,18 +9,36 @@ module.exports = {
     filename: "main.js",
   },
   module: {
-    rules: [{
+    rules: [
+      {
         test: /\.m?js$/,
         exclude: /node_modules/,
         use: {
-            loader: 'babel-loader',
-        }
-    }]
+          loader: "babel-loader",
+        },
+      },
+      {
+        test: /\.s[ac]ss$/i,
+        exclude: /node_modules/,
+        use: [
+          // Creates `style` nodes from JS strings
+          "style-loader",
+          // Translates CSS into CommonJS
+          "css-loader",
+          // Compiles Sass to CSS
+          "sass-loader",
+        ],
+      },
+    ],
   },
-  "plugins": [
-      new HtmlWebpackPlugin({
-          template: './public/index.html',
-          filename: 'index.html'
-      })
-  ]
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: "./public/index.html",
+      filename: "index.html",
+    }),
+  ],
+  devServer: {
+    open: true,
+    compress: true,
+  },
 };
