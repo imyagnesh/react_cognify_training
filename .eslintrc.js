@@ -21,6 +21,7 @@ module.exports = {
         extensions: [".js", ".jsx"],
       },
     ],
+    "react/state-in-constructor": 0,
     "prettier/prettier": "error",
     "arrow-body-style": "off",
     "prefer-arrow-callback": "off",
