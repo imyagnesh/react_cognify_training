@@ -12,4 +12,4 @@ import App from "./App";
 
 // Function component
 
-ReactDOM.render(<App firstName="yagneshh" lastName="modh" />, document.getElementById("root"));
+ReactDOM.render(<App />, document.getElementById("root"));
