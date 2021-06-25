@@ -9,40 +9,112 @@ export class App extends Component {
   state = {
     todoList: [],
     filterType: "all",
+    error: null,
+    loading: false,
   };
 
-  addTodo = event => {
+  // constructor(props) {
+  //   super(props);
+  //   this.state = {
+  //     greet: `Hello, ${props.firstName}`,
+  //   };
+  //   // this.xyz = this.xyz.bind(this);
+  // }
+
+  // static getDerivedStateFromProps(props, state) {
+  //   return {
+
+  //   }
+  // }
+
+  componentDidMount = async () => {
+    try {
+      this.setState({
+        loading: true,
+      });
+      const res = await fetch("http://localhost:3000/todo");
+      const json = await res.json();
+      this.setState({
+        todoList: json,
+        loading: false,
+      });
+    } catch (error) {
+      this.setState({
+        error,
+        loading: false,
+      });
+    }
+  };
+
+  addTodo = async event => {
     event.preventDefault();
+    try {
+      this.setState({
+        loading: true,
+      });
+      const res = await fetch("http://localhost:3000/todo", {
+        method: "POST",
+        body: JSON.stringify({ todoText: this.todoInput.current.value, isDone: false }),
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      });
 
-    const { todoList } = this.state;
+      const json = await res.json();
 
-    this.setState(
-      {
-        todoList: [
-          ...todoList,
-          { todoText: this.todoInput.current.value, isDone: false, id: new Date().valueOf() },
-        ],
-        filterType: "all",
-      },
-      () => {
-        this.todoInput.current.value = "";
-      },
-    );
+      const { todoList } = this.state;
+
+      this.setState(
+        {
+          todoList: [...todoList, json],
+          filterType: "all",
+          loading: false,
+        },
+        () => {
+          this.todoInput.current.value = "";
+        },
+      );
+    } catch (error) {
+      this.setState({
+        error,
+        loading: false,
+      });
+    }
   };
 
-  completeTodo = todoItem => {
-    const { todoList } = this.state;
-    const index = todoList.findIndex(x => x.id === todoItem.id);
+  completeTodo = async todoItem => {
+    try {
+      this.setState({
+        loading: true,
+      });
 
-    const updatedTodoList = [
-      ...todoList.slice(0, index),
-      { ...todoItem, isDone: !todoItem.isDone },
-      ...todoList.slice(index + 1),
-    ];
+      const res = await fetch(`http://localhost:3000/todo/${todoItem.id}`, {
+        method: "PUT",
+        body: JSON.stringify({ ...todoItem, isDone: !todoItem.isDone }),
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      });
 
-    this.setState({
-      todoList: updatedTodoList,
-    });
+      const json = await res.json();
+
+      const { todoList } = this.state;
+      const index = todoList.findIndex(x => x.id === todoItem.id);
+
+      const updatedTodoList = [...todoList.slice(0, index), json, ...todoList.slice(index + 1)];
+
+      this.setState({
+        todoList: updatedTodoList,
+        loading: false,
+      });
+    } catch (error) {
+      this.setState({
+        error,
+        loading: false,
+      });
+    }
   };
 
   deleteTodo = todoItem => {
@@ -74,7 +146,15 @@ export class App extends Component {
   };
 
   render() {
-    const { filterType } = this.state;
+    const { filterType, error, loading } = this.state;
+
+    if (error) {
+      return <h1>{error.message}</h1>;
+    }
+
+    if (loading) {
+      return <h1>Loading...</h1>;
+    }
 
     return (
       <div>
