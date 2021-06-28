@@ -1,5 +1,5 @@
 // import React, { Component, createRef } from "react";
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 
 import axios from "axios";
 import TodoFilter from "./todos/todoFilter";
@@ -25,95 +25,97 @@ const axiosInstance = axios.create({
 // 2. less code
 // 3. if you implement proper hook then performance is better
 
-const App = ({ initialGreet }) => {
-  // const [todoList, setTodoList] = useState([]);
-  const [greet, setGreet] = useState(initialGreet);
-  const [firstname, setFirstname] = useState("Yagnesh");
-  const [lastName, setLastName] = useState("Modh");
+const App = () => {
+  const [loading, setLoading] = useState(false);
+  const [todoList, setTodoList] = useState([]);
+  const [error, setError] = useState(null);
+  const [filterType, setFilterType] = useState("all");
 
-  // useEffect(() => {
-  //   console.log("compononet did mount");
-  //   return () => {
-  //     console.log("component will unmount");
-  //   };
-  // }, []);
+  const todoInput = useRef(null);
 
-  // useEffect(() => {
-  //   console.log("useEffect");
-  //   return () => {
-  //     console.log("component will unmount");
-  //   };
-  // });
+  const getTodos = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await axiosInstance("todo");
+      setTodoList(res.data);
+      setLoading(false);
+    } catch (err) {
+      setError(err);
+      setLoading(false);
+    }
+  }, []);
 
-  // 1. NEVER USE COMPONENTWILLUNMOUNT WITHOUT EMPTY ARRAY
-  // 2. NEVER USE USEEFFECT WITHOUT SECOND PARAMETER
+  const addTodo = async event => {
+    event.preventDefault();
+    try {
+      setLoading(true);
+      const res = await axiosInstance.post("todo", {
+        todoText: todoInput.current.value,
+        isDone: false,
+      });
 
-  // 1. SNAPSHOT BEFORE UPDATE
-  // 2. GETDERIVEDSTATEFROMERROR
-  // 3. COMPONENTDIDCATCH
+      setLoading(false);
+      setTodoList([...todoList, res.data]);
+      setFilterType("all");
 
-  // componentDidMount
-  // componentWillUpdate
+      todoInput.current.value = "";
+    } catch (err) {
+      setError(err);
+      setLoading(false);
+    }
+  };
 
   // component did mount
   useEffect(() => {
-    console.log("use effetct with empty array");
-    return () => {
-      console.log("component will unmount on with empty array");
-    };
-  }, []);
+    getTodos();
+    return () => {};
+  }, [getTodos]);
 
-  useEffect(() => {
-    console.log("use effetct with firstName");
-  }, [firstname]);
+  if (loading) {
+    return <h1>Loading...</h1>;
+  }
 
-  useEffect(() => {
-    console.log("use effetct with lastName");
-  }, [lastName]);
+  if (error) {
+    return <h1>{error.message}</h1>;
+  }
 
-  useEffect(() => {
-    console.log("use effetct with firstname & lastName");
-  }, [firstname, lastName]);
-
-  const callGreet = () => {
-    setGreet("hola");
-  };
-
-  const changeFistName = () => {
-    setFirstname("Rohit");
-  };
-
-  const changeLastName = () => {
-    setLastName("Sharma");
-  };
-
-  const chnageName = () => {
-    setFirstname("Rohit");
-
-    setLastName("Sharma");
-  };
-
-  console.log("render");
   return (
     <div>
-      <h1>{greet}</h1>
-      <h1>{firstname}</h1>
-      <h1>{lastName}</h1>
-      <button type="button" onClick={callGreet}>
-        Click Me
-      </button>
+      <h1>Todo App</h1>
+      <TodoForm addTodo={addTodo} ref={todoInput} />
+      <TodoList data={todoList} completeTodo={() => {}} deleteTodo={() => {}} />
 
-      <button type="button" onClick={changeFistName}>
-        Change FirstName
-      </button>
+      {/* <TodoFilter
+        onFilter={async ft => {
+          try {
+            this.setState({
+              loading: true,
+            });
+            let params = {};
+            if (ft !== "all") {
+              params = {
+                isDone: ft === "completed",
+              };
+            }
 
-      <button type="button" onClick={changeLastName}>
-        Change LastName
-      </button>
+            const res = await axiosInstance.get("todo", {
+              params,
+            });
 
-      <button type="button" onClick={chnageName}>
-        Change FullName
-      </button>
+            this.setState({
+              filterType: ft,
+              todoList: res.data,
+              loading: false,
+            });
+          } catch (err) {
+            this.setState({
+              error: err,
+              loading: false,
+            });
+          }
+        }}
+        filterType={filterType}
+      /> */}
     </div>
   );
 };
