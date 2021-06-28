@@ -1,7 +1,14 @@
 import React, { Component, createRef } from "react";
+import axios from "axios";
 import TodoFilter from "./todos/todoFilter";
 import TodoList from "./todos/todoList";
 import TodoForm from "./todos/todoForm";
+
+const axiosInstance = axios.create({
+  url: "/todo",
+  baseURL: "http://localhost:3000/",
+  timeout: 3000,
+});
 
 export class App extends Component {
   todoInput = createRef();
@@ -32,10 +39,9 @@ export class App extends Component {
       this.setState({
         loading: true,
       });
-      const res = await fetch("http://localhost:3000/todo");
-      const json = await res.json();
+      const res = await axiosInstance.get("todo");
       this.setState({
-        todoList: json,
+        todoList: res.data,
         loading: false,
       });
     } catch (error) {
@@ -52,22 +58,16 @@ export class App extends Component {
       this.setState({
         loading: true,
       });
-      const res = await fetch("http://localhost:3000/todo", {
-        method: "POST",
-        body: JSON.stringify({ todoText: this.todoInput.current.value, isDone: false }),
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
+      const res = await axiosInstance.post("todo", {
+        todoText: this.todoInput.current.value,
+        isDone: false,
       });
-
-      const json = await res.json();
 
       const { todoList } = this.state;
 
       this.setState(
         {
-          todoList: [...todoList, json],
+          todoList: [...todoList, res.data],
           filterType: "all",
           loading: false,
         },
@@ -89,21 +89,15 @@ export class App extends Component {
         loading: true,
       });
 
-      const res = await fetch(`http://localhost:3000/todo/${todoItem.id}`, {
-        method: "PUT",
-        body: JSON.stringify({ ...todoItem, isDone: !todoItem.isDone }),
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
+      const res = await axiosInstance.put(`todo/${todoItem.id}`, {
+        ...todoItem,
+        isDone: !todoItem.isDone,
       });
-
-      const json = await res.json();
 
       const { todoList } = this.state;
       const index = todoList.findIndex(x => x.id === todoItem.id);
 
-      const updatedTodoList = [...todoList.slice(0, index), json, ...todoList.slice(index + 1)];
+      const updatedTodoList = [...todoList.slice(0, index), res.data, ...todoList.slice(index + 1)];
 
       this.setState({
         todoList: updatedTodoList,
@@ -117,36 +111,51 @@ export class App extends Component {
     }
   };
 
-  deleteTodo = todoItem => {
-    const { todoList } = this.state;
-    const index = todoList.findIndex(x => x.id === todoItem.id);
+  deleteTodo = async todoItem => {
+    try {
+      this.setState({
+        loading: true,
+      });
 
-    const updatedTodoList = [...todoList.slice(0, index), ...todoList.slice(index + 1)];
+      await axiosInstance.delete(`todo/${todoItem.id}`);
 
-    this.setState({
-      todoList: updatedTodoList,
-    });
+      const { todoList } = this.state;
+
+      const index = todoList.findIndex(x => x.id === todoItem.id);
+
+      const updatedTodoList = [...todoList.slice(0, index), ...todoList.slice(index + 1)];
+
+      this.setState({
+        todoList: updatedTodoList,
+        loading: false,
+      });
+    } catch (error) {
+      this.setState({
+        error,
+        loading: false,
+      });
+    }
   };
 
-  filteredTodos = () => {
-    const { todoList, filterType } = this.state;
+  // filteredTodos = () => {
+  //   const { todoList, filterType } = this.state;
 
-    return todoList.filter(todoItem => {
-      switch (filterType) {
-        case "completed":
-          return todoItem.isDone;
+  //   return todoList.filter(todoItem => {
+  //     switch (filterType) {
+  //       case "completed":
+  //         return todoItem.isDone;
 
-        case "pending":
-          return !todoItem.isDone;
+  //       case "pending":
+  //         return !todoItem.isDone;
 
-        default:
-          return true;
-      }
-    });
-  };
+  //       default:
+  //         return true;
+  //     }
+  //   });
+  // };
 
   render() {
-    const { filterType, error, loading } = this.state;
+    const { filterType, error, loading, todoList } = this.state;
 
     if (error) {
       return <h1>{error.message}</h1>;
@@ -160,16 +169,35 @@ export class App extends Component {
       <div>
         <h1>Todo App</h1>
         <TodoForm addTodo={this.addTodo} ref={this.todoInput} />
-        <TodoList
-          data={this.filteredTodos()}
-          completeTodo={this.completeTodo}
-          deleteTodo={this.deleteTodo}
-        />
+        <TodoList data={todoList} completeTodo={this.completeTodo} deleteTodo={this.deleteTodo} />
         <TodoFilter
-          onFilter={ft => {
-            this.setState({
-              filterType: ft,
-            });
+          onFilter={async ft => {
+            try {
+              this.setState({
+                loading: true,
+              });
+              let params = {};
+              if (ft !== "all") {
+                params = {
+                  isDone: ft === "completed",
+                };
+              }
+
+              const res = await axiosInstance.get("todo", {
+                params,
+              });
+
+              this.setState({
+                filterType: ft,
+                todoList: res.data,
+                loading: false,
+              });
+            } catch (err) {
+              this.setState({
+                error: err,
+                loading: false,
+              });
+            }
           }}
           filterType={filterType}
         />

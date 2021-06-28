@@ -1,7 +1,7 @@
 {
   "todo": [
     {
-      "todoText": "Get milk",
+      "todoText": "get milk",
       "isDone": true,
       "id": 1
     },
@@ -9,6 +9,11 @@
       "todoText": "give training",
       "isDone": false,
       "id": 2
+    },
+    {
+      "todoText": "Get Milk",
+      "isDone": false,
+      "id": 3
     }
   ]
 }
