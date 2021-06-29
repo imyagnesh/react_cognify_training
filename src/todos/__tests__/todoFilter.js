@@ -14,12 +14,12 @@ const setup = () => {
   return render(<TodoFilter {...props} />);
 };
 
-describe("snapshot", () => {
-  const { container } = setup();
-  expect(container.firstChild).toMatchSnapshot();
-});
-
 describe("todofilter component", () => {
+  test("should render snapshot", () => {
+    const { container } = setup();
+    expect(container.firstChild).toMatchSnapshot();
+  });
+
   test("should render todoFilter component", () => {
     const { findByTestId } = setup();
     expect(findByTestId("todofilter-container")).not.toBeNull();

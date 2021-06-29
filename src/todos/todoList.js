@@ -2,12 +2,11 @@ import React, { memo } from "react";
 import PropTypes from "prop-types";
 
 const TodoList = ({ data, completeTodo, deleteTodo }) => {
-  console.log("TodoList");
   return (
-    <div>
+    <div data-testid="todoList-container">
       {/* always use unique ID instead of Index to improve performace */}
       {data.map(todoItem => (
-        <div key={todoItem.id}>
+        <div data-testid="todoList-item" key={todoItem.id}>
           <input
             type="checkbox"
             checked={todoItem.isDone}

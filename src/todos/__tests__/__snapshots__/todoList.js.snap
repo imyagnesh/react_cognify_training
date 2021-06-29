@@ -1,0 +1,66 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TodoList component should render snapshot 1`] = `
+<div
+  data-testid="todoList-container"
+/>
+`;
+
+exports[`TodoList component should render snapshot with data 1`] = `
+<div
+  data-testid="todoList-container"
+>
+  <div
+    data-testid="todoList-item"
+  >
+    <input
+      checked=""
+      type="checkbox"
+    />
+    <span
+      style="text-decoration: line-through;"
+    >
+      get milk
+    </span>
+    <button
+      type="button"
+    >
+      Delete
+    </button>
+  </div>
+  <div
+    data-testid="todoList-item"
+  >
+    <input
+      type="checkbox"
+    />
+    <span
+      style="text-decoration: none;"
+    >
+      Get Milk
+    </span>
+    <button
+      type="button"
+    >
+      Delete
+    </button>
+  </div>
+  <div
+    data-testid="todoList-item"
+  >
+    <input
+      type="checkbox"
+    />
+    <span
+      style="text-decoration: none;"
+    >
+      learn vue
+    </span>
+    <button
+      type="button"
+    >
+      Delete
+    </button>
+  </div>
+</div>
+`;
