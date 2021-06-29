@@ -3,6 +3,7 @@ module.exports = {
     browser: true,
     es2021: true,
     node: true,
+    jest: true,
   },
   parser: "@babel/eslint-parser",
   extends: ["plugin:react/recommended", "airbnb", "plugin:prettier/recommended"],

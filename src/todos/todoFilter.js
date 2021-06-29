@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 
 const TodoFilter = ({ onFilter, filterType }) => {
   return (
-    <div>
+    <div data-testid="todofilter-container">
       <button
         type="button"
         style={{ border: filterType === "all" ? "1px solid red" : "none" }}

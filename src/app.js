@@ -65,6 +65,68 @@ const App = () => {
     }
   };
 
+  const completeTodo = async todoItem => {
+    try {
+      setLoading(true);
+
+      const res = await axiosInstance.put(`todo/${todoItem.id}`, {
+        ...todoItem,
+        isDone: !todoItem.isDone,
+      });
+
+      const index = todoList.findIndex(x => x.id === todoItem.id);
+
+      const updatedTodoList = [...todoList.slice(0, index), res.data, ...todoList.slice(index + 1)];
+
+      setTodoList(updatedTodoList);
+      setLoading(false);
+    } catch (err) {
+      setLoading(false);
+      setError(err);
+    }
+  };
+
+  const deleteTodo = async todoItem => {
+    try {
+      setLoading(true);
+
+      await axiosInstance.delete(`todo/${todoItem.id}`);
+
+      const index = todoList.findIndex(x => x.id === todoItem.id);
+
+      const updatedTodoList = [...todoList.slice(0, index), ...todoList.slice(index + 1)];
+
+      setTodoList(updatedTodoList);
+      setLoading(false);
+    } catch (err) {
+      setError(err);
+      setLoading(false);
+    }
+  };
+
+  const filter = async ft => {
+    try {
+      setLoading(true);
+      let params = {};
+      if (ft !== "all") {
+        params = {
+          isDone: ft === "completed",
+        };
+      }
+
+      const res = await axiosInstance.get("todo", {
+        params,
+      });
+
+      setFilterType(ft);
+      setTodoList(res.data);
+      setLoading(false);
+    } catch (err) {
+      setLoading(false);
+      setError(err);
+    }
+  };
+
   // component did mount
   useEffect(() => {
     getTodos();
@@ -83,39 +145,8 @@ const App = () => {
     <div>
       <h1>Todo App</h1>
       <TodoForm addTodo={addTodo} ref={todoInput} />
-      <TodoList data={todoList} completeTodo={() => {}} deleteTodo={() => {}} />
-
-      {/* <TodoFilter
-        onFilter={async ft => {
-          try {
-            this.setState({
-              loading: true,
-            });
-            let params = {};
-            if (ft !== "all") {
-              params = {
-                isDone: ft === "completed",
-              };
-            }
-
-            const res = await axiosInstance.get("todo", {
-              params,
-            });
-
-            this.setState({
-              filterType: ft,
-              todoList: res.data,
-              loading: false,
-            });
-          } catch (err) {
-            this.setState({
-              error: err,
-              loading: false,
-            });
-          }
-        }}
-        filterType={filterType}
-      /> */}
+      <TodoList data={todoList} completeTodo={completeTodo} deleteTodo={deleteTodo} />
+      <TodoFilter onFilter={filter} filterType={filterType} />
     </div>
   );
 };

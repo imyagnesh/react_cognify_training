@@ -6,19 +6,14 @@
       "id": 1
     },
     {
-      "todoText": "give training",
-      "isDone": false,
-      "id": 2
-    },
-    {
       "todoText": "Get Milk",
       "isDone": false,
       "id": 3
     },
     {
-      "todoText": "learn react",
+      "todoText": "learn vue",
       "isDone": false,
-      "id": 4
+      "id": 5
     }
   ]
 }
