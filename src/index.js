@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import App from "./App";
+import AppRoute from "./router";
 
 // Rules
 // 1. Name should should start with capital letter
@@ -12,4 +13,4 @@ import App from "./App";
 
 // Function component
 
-ReactDOM.render(<App />, document.getElementById("root"));
+ReactDOM.render(<AppRoute />, document.getElementById("root"));

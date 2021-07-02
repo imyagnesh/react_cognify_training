@@ -6,7 +6,7 @@ import TodoFilter from "./todos/todoFilter";
 import TodoList from "./todos/todoList";
 import TodoForm from "./todos/todoForm";
 
-const axiosInstance = axios.create({
+export const axiosInstance = axios.create({
   url: "/todo",
   baseURL: "http://localhost:3000/",
   timeout: 3000,
@@ -142,11 +142,16 @@ const App = () => {
   }
 
   return (
-    <div>
+    <div data-testid="todoapp-wrapper">
       <h1>Todo App</h1>
-      <TodoForm addTodo={addTodo} ref={todoInput} />
-      <TodoList data={todoList} completeTodo={completeTodo} deleteTodo={deleteTodo} />
-      <TodoFilter onFilter={filter} filterType={filterType} />
+      <TodoForm data-testid="todo-form" addTodo={addTodo} ref={todoInput} />
+      <TodoList
+        data-testid="todo-list"
+        data={todoList}
+        completeTodo={completeTodo}
+        deleteTodo={deleteTodo}
+      />
+      <TodoFilter data-testid="todo-filter" onFilter={filter} filterType={filterType} />
     </div>
   );
 };

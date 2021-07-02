@@ -1,6 +1,6 @@
 import React from "react";
 
-import { render, fireEvent, screen } from "@testing-library/react";
+import { render, fireEvent } from "@testing-library/react";
 import TodoList from "../todoList";
 
 const listData = [
@@ -54,7 +54,7 @@ describe("TodoList component", () => {
     const { queryAllByTestId } = setup(listData);
     const items = queryAllByTestId("todoList-item");
     expect(items.length).toBe(listData.length);
-    for (let i = 0; i < listData.length; i++) {
+    for (let i = 0; i < listData.length; i += 1) {
       const element = items[i];
       expect(element.childNodes.length).toBe(3);
       expect(element.childNodes[0]).toHaveAttribute("type", "checkbox");
@@ -63,9 +63,9 @@ describe("TodoList component", () => {
       } else {
         expect(element.childNodes[0]).not.toHaveAttribute("checked");
       }
-      //   fireEvent.change(element.childNodes[0]);
-      //   expect(fnCompletedTodo).toBeCalledTimes(1);
-      //   expect(fnCompletedTodo).toBeCalledWith(listData[i]);
+      fireEvent.click(element.firstChild);
+      expect(fnCompletedTodo).toBeCalledTimes(i + 1);
+      expect(fnCompletedTodo).toBeCalledWith(listData[i]);
 
       expect(element.childNodes[1]).toHaveTextContent(listData[i].todoText);
       expect(element.childNodes[1]).toHaveStyle(
@@ -73,8 +73,9 @@ describe("TodoList component", () => {
       );
       expect(element.childNodes[2]).toHaveAttribute("type", "button");
       expect(element.childNodes[2]).toHaveTextContent("Delete");
+      fireEvent.click(element.lastChild);
+      expect(fnDeleteTodo).toBeCalledTimes(i + 1);
+      expect(fnDeleteTodo).toBeCalledWith(listData[i]);
     }
-    // expect(items[0].childNodes.length).toBe(3);
-    // expect(items[0].childNodes[0]).toHaveAttribute("type", "checkbox");
   });
 });
